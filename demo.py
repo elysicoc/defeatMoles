@@ -3,6 +3,7 @@ import ndimage
 from pylab import *
 from scipy import *
 
+
 def normalize_histogram(image, cutoff_percent=0.01):
     assert image.dtype == uint8, "Assumes uint8 only"
     px_count = image.size
@@ -78,15 +79,33 @@ def skinDetection(img, treshold=80, color=[255,20,147]):
 				res[x,y,:]=img[x,y,:]
 
 	return res
- 
-#img= imread("C:/Users/Kiarash/Dropbox/Git/defeatMoles/img012.jpg")
+	
+	
+import cv2
+def moleDetection(img, minArea=80):
+	params=cv2.SimpleBlobDetector_Params()
+	params.filterByColor=False
+	params.filterByConvexity=False
+	params.filterByInertia=True
+	params.minArea=minArea
+	detector=cv2.SimpleBlobDetector(params)
+	pts=detector.detect(img)
+
+	return pts
+	
+	
+img= imread("C:/Users/Kiarash/Dropbox/Git/defeatMoles/img012.jpg")
 
 #skin=skinDetection(img, 55)
-import cv
-import cv2
-im = cv.LoadImageM("C:/Users/Kiarash/Dropbox/Git/defeatMoles/img012.jpg", 1)
-dst=cv2.SimpleBlobDetector(im)
-cv.SaveImage("C:/Users/Kiarash/Dropbox/Git/defeatMoles/foo-laplace.png", dst)
+
+moles=moleDetection(img)
+
+while(len(moles)>0):
+	p=moles.pop().pt
+	gca().add_patch(Circle(p, 50, facecolor='none', edgecolor='r'))	
+
+
+imshow(img)
 
 
 '''gray=rgb2gray(img).astype(uint8)
